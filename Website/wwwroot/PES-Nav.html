@@ -2,22 +2,34 @@
 <html lang="en" style="margin-top: 0%; height: 100%;">
 <head>
     <!--my GMaps API Key AIzaSyDNrz8SIgGBVIHxDrgle3FpMDhdcY4hp7E-->
-    <!--Remember to restrict access-->
+    <!--my BMaps API Key AqeEXgtgRJb6kjVJvPVSr0uwxixVfQ7-c8WzwDYwS5yapY6NWeAYM6-q7306GvvP-->
+    <!--my WRLDMaps API Key a1498ba0cc8f3defbc52710d95eb70df-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PES University Map</title>
     <script text="text/javascript" src="MainJS.js"></script>
     <link rel="stylesheet" type="text/css" href="MainCSS.css"/>
+    <script src="https://cdn-webgl.wrld3d.com/wrldjs/dist/latest/wrld.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" rel="stylesheet"/>
 </head>
-<body style="vertical-align: top; margin-top: 0%; height: 100%;" onload='initBMap();'>
+<body style="vertical-align: top; margin-top: 0%; height: 100%;" onload='OnPageLoad();'>
     <div id="Top-Bar">
         <p style="text-align: left; margin-left: 2%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white;"><b>PES University Map</b></p>
-        <button id="MapSelButton" style="right: 2%; top: 33%; position: absolute;" onclick="MapSelButtonClick()">Go to Bing Maps</button>
+        <select id="MapOptions" style="right: 2%; top: 33%; position: absolute;" onchange="MapOptionsChange()">
+            <option value="GMaps">Google Maps</option>
+            <option value="BMaps">Bing Maps</option>
+            <option value="WRLDMaps">WRLD Maps</option>
+        </select>
     </div>
     <div id='BMap'></div>
     <div id="GMap"></div>
+    <div id="WRLDMap"></div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNrz8SIgGBVIHxDrgle3FpMDhdcY4hp7E&callback=initGMap" async defer></script>
-    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AqeEXgtgRJb6kjVJvPVSr0uwxixVfQ7-c8WzwDYwS5yapY6NWeAYM6-q7306GvvP'></script>
+    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AqeEXgtgRJb6kjVJvPVSr0uwxixVfQ7-c8WzwDYwS5yapY6NWeAYM6-q7306GvvP' async defer></script>
+    <script>L.Wrld.map("WRLDMap", "a1498ba0cc8f3defbc52710d95eb70df");</script>
+    <div id="loader" style="text-align: center;">
+        <img src="../assets/White-Bounce-Ball-Loader.svg" alt="Loading..." style="top:40%; position: relative">
+    </div>
 </body>
 </html>

@@ -8,6 +8,11 @@ function initGMap()
     });
 }
 var BingMap;
+function OnPageLoad()
+{
+    initBMap();
+    document.getElementById('loader').style.visibility = "hidden";
+}
 function initBMap()
 {
     BingMap = new Microsoft.Maps.Map(document.getElementById('BMap'),
@@ -15,19 +20,27 @@ function initBMap()
         center: new Microsoft.Maps.Location(12.934398, 77.534476),
         zoom: 18
     });
+    document.getElementById('GMap').style.visibility = "hidden";
+    document.getElementById('BMap').style.visibility = "visible";
+    document.getElementById('WRLDMap').style.visibility = "hidden";
+    document.getElementById('MapOptions').selectedIndex = 1;
 }
-function MapSelButtonClick()
+function MapOptionsChange()
 {
-    if(document.getElementById('GMap').style.visibility == "visible")
+    var MapOptions = document.getElementById('MapOptions');
+    document.getElementById('GMap').style.visibility = "hidden";
+    document.getElementById('BMap').style.visibility = "hidden";
+    document.getElementById('WRLDMap').style.visibility = "hidden";
+    switch(MapOptions.options[MapOptions.selectedIndex].value)
     {
-        document.getElementById('GMap').style.visibility = "hidden";
-        document.getElementById('BMap').style.visibility = "visible";
-        document.getElementById('MapSelButton').textContent = "Go to Google Maps";
-    }
-    else
-    {
-        document.getElementById('GMap').style.visibility = "visible";
-        document.getElementById('BMap').style.visibility = "hidden";
-        document.getElementById('MapSelButton').textContent = "Go to Bing Maps";
+        case "GMaps":
+            document.getElementById('GMap').style.visibility = "visible";
+            break;
+        case "BMaps":
+            document.getElementById('BMap').style.visibility = "visible";
+            break;
+        case "WRLDMaps":
+            document.getElementById('WRLDMap').style.visibility = "visible";
+            break;
     }
 }
