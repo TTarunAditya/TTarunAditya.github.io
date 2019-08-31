@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="MainCSS.css"/>
     <script src="https://cdn-webgl.wrld3d.com/wrldjs/dist/latest/wrld.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" rel="stylesheet"/>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.0/mapbox-gl.css' rel='stylesheet' />
 </head>
 <body style="vertical-align: top; margin-top: 0%; height: 100%;" onload='OnPageLoad();'>
     <div id="Top-Bar">
@@ -19,15 +21,14 @@
         <select id="MapOptions" style="right: 2%; top: 33%; position: absolute;" onchange="MapOptionsChange()">
             <option value="GMaps">Google Maps</option>
             <option value="BMaps">Bing Maps</option>
-            <option value="WRLDMaps">WRLD Maps</option>
+            <option value="MapBox">MapBox Maps</option>
         </select>
     </div>
     <div id='BMap'></div>
     <div id="GMap"></div>
-    <div id="WRLDMap"></div>
+    <div id='MapBox'></div>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNrz8SIgGBVIHxDrgle3FpMDhdcY4hp7E&callback=initGMap" async defer></script>
     <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AqeEXgtgRJb6kjVJvPVSr0uwxixVfQ7-c8WzwDYwS5yapY6NWeAYM6-q7306GvvP' async defer></script>
-    <script type='text/javascript' src='WRLDMaps.js'></script>
     <div id="loader" style="text-align: center;">
         <img src="../assets/White-Bounce-Ball-Loader.svg" alt="Loading..." style="top:40%; position: relative">
     </div>

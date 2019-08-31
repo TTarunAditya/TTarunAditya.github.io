@@ -11,6 +11,7 @@ var BingMap;
 function OnPageLoad()
 {
     initBMap();
+    initMapBox();
     document.getElementById('loader').style.visibility = "hidden";
 }
 function initBMap()
@@ -22,15 +23,23 @@ function initBMap()
     });
     document.getElementById('GMap').style.visibility = "hidden";
     document.getElementById('BMap').style.visibility = "visible";
-    document.getElementById('WRLDMap').style.visibility = "hidden";
+    document.getElementById('MapBox').style.visibility = "hidden";
     document.getElementById('MapOptions').selectedIndex = 1;
+}
+function initMapBox()
+{
+    mapboxgl.accessToken = 'pk.eyJ1IjoidHRhcnVuYWRpdHlhIiwiYSI6ImNqeno4Yjk2azB5dGkzYmtpZGYybGp3dWcifQ.RHkvQz9GQiKQlRZv4_EXjQ';
+    var map = new mapboxgl.Map({
+    container: 'MapBox',
+    style: 'mapbox://styles/mapbox/streets-v9'
+    });
 }
 function MapOptionsChange()
 {
     var MapOptions = document.getElementById('MapOptions');
     document.getElementById('GMap').style.visibility = "hidden";
     document.getElementById('BMap').style.visibility = "hidden";
-    document.getElementById('WRLDMap').style.visibility = "hidden";
+    document.getElementById('MapBox').style.visibility = "hidden";
     switch(MapOptions.options[MapOptions.selectedIndex].value)
     {
         case "GMaps":
@@ -39,8 +48,8 @@ function MapOptionsChange()
         case "BMaps":
             document.getElementById('BMap').style.visibility = "visible";
             break;
-        case "WRLDMaps":
-            document.getElementById('WRLDMap').style.visibility = "visible";
+        case "MapBox":
+            document.getElementById('MapBox').style.visibility = "visible";
             break;
     }
 }
