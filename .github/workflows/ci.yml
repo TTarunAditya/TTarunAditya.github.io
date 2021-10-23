@@ -21,7 +21,7 @@ jobs:
 
         # Generate the website
         - name: Publish
-          run: dotnet publish website-Blazor-WASM.csproj --configuration Release
+          run: dotnet publish --project website-Blazor-WASM/website-Blazor-WASM.csproj --configuration Release
 
         # Publish the website
         - name: GitHub Pages action
