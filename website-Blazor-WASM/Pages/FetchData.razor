@@ -1,57 +1,246 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Converters
+@using Newtonsoft.Json.Linq;
+@using System.Dynamic
 
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Big Data Assignment - Data requests</PageTitle>
 
-<h1>Weather forecast</h1>
+<h1>Big Data Assignment - Data requests</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<br />
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<div style="padding: 1rem; margin: 0.5rem; border-radius:3px; background-color: lightgray">
+	<h3>View your assignment results here</h3>
+	
+	<EditForm Model=assignment>
+	
+		<InputRadioGroup @bind-Value=assignment.ass_id>
+			@foreach (string ass in assignment.ass_options)
+		   {
+				<InputRadio Value=ass /> @ass <br/>
+		   }
+		</InputRadioGroup>
+		
+		<div style="margin: 1rem">
+			<p>Submission ID 1</p>
+			<InputText @bind-Value=assignment.sub_id_0></InputText>
+		</div>
+		
+		<div style="margin: 1rem">
+			<p>Submission ID 2</p>
+			<InputText @bind-Value=assignment.sub_id_1></InputText>
+		</div>
+	
+		<br/>
+		
+		<button @onclick=assignment.getSubmissionResult style="margin: 1rem" class="btn btn-primary">Get Results</button>
+	
+		<br />
+	
+		<h4>Results: </h4>
+		
+		<p class="text-danger">@assignment.error</p>
+		
+		@if (assignment.resultObj != null)
+		{
+			foreach (var prop in (IEnumerable<dynamic>)assignment.resultObj)
+			{
+			   <p>@prop. Name: @prop.GetValue(assignment.resultObj,null)</p>;
+			}
+		}
+		else
+		{
+			<p>Your results will appear here</p>
+		}
+	
+	</EditForm>
+</div>
+
+
+<div style="padding: 1rem; margin: 0.5rem; border-radius:3px; background-color: lightgray">
+	<h3>View current job status here</h3>
+	
+	<button @onclick=getCurrentJobStatus style="margin: 1rem" class="btn btn-primary">Get Current Job Status</button>
+	
+	<br />
+	
+	<p class="text-danger">@jobStatusError</p>
+	
+	@if (jobStatus != null)
+	{
+		<p>@jobStatus</p>
+	}
+	else
+	{
+		<p>The status will appear here</p>
+	}
+	
+</div> 
+
+
+<div style="padding: 1rem; margin: 0.5rem; border-radius:3px; background-color: lightgray">
+	<h3>View your assignment status here</h3>
+	
+	<div style="margin: 1rem">
+		<p>Submission ID</p>
+		<input @bind=statusSubmissionID></input>
+	</div>
+		
+	<button @onclick=getSubmissionStatus style="margin: 1rem" class="btn btn-primary">Get Submission Status</button>
+	
+	<br />
+	
+	<h4>Results: </h4>
+	
+	<p class="text-danger">@submissionStatusError</p>
+	
+	@if (submissionStatus != null)
+	{
+		<p>@submissionStatus</p>
+	}
+	else
+	{
+		<p>The status will appear here</p>
+	}
+</div>
+
 
 @code {
-    private WeatherForecast[]? forecasts;
 
-    protected override async Task OnInitializedAsync()
-    {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
-    }
+	private Assignment assignment = new Assignment();
 
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
+	protected override async Task OnInitializedAsync()
+	{
+		await getCurrentJobStatus();
+	}
 
-        public int TemperatureC { get; set; }
+	public string jobStatusError = "";
+	public string? jobStatus = null;
 
-        public string? Summary { get; set; }
+	private async Task getCurrentJobStatus()
+	{
+		HttpClient Client = new HttpClient();
+		Uri uri = new Uri("http://34.134.176.176:5000/wait");
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
+		try
+		{
+			HttpResponseMessage response = await Client.GetAsync(uri);
+
+			if (response.IsSuccessStatusCode)
+			{
+				string jobStatus = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+			}
+			else
+			{
+				jobStatusError = "GET error";
+			}
+		}
+		catch (Exception e)
+		{
+			jobStatusError = "Network error: " + e.Message;
+			return;
+		}
+	}
+
+	public string submissionStatusError = "";
+	public string? submissionStatus = null;
+	public string statusSubmissionID = "0";
+
+	private async Task getSubmissionStatus()
+	{
+		HttpClient Client = new HttpClient();
+		Uri uri = new Uri("http://34.134.176.176:5000/wait");
+
+		string json_str;
+		try
+		{
+			json_str = $"{{\"_id\":{int.Parse(statusSubmissionID)} }}";
+			Console.WriteLine(json_str);
+		}
+		catch (Exception e)
+		{
+			submissionStatusError = "JSON error: " + e.Message;
+			return;
+		}
+
+		var content = new StringContent(json_str);
+
+		try
+		{
+			HttpResponseMessage response = await Client.PostAsync(uri, content);
+
+			if (response.IsSuccessStatusCode)
+			{
+				submissionStatus = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+			}
+			else
+			{
+				submissionStatusError = "POST error";
+			}
+		}
+		catch (Exception e)
+		{
+			submissionStatusError = "Network error: " + e.Message;
+			return;
+		}
+	}
+
+
+	public class Assignment
+	{
+		public string ass_id = "A2";
+
+		public readonly string[] ass_options = { "A1", "A2" };
+
+		public string sub_id_0 = "0";
+		public string sub_id_1 = "1";
+
+		public string error = "";
+
+		public dynamic? resultObj = null;
+
+		async public Task getSubmissionResult()
+		{
+			HttpClient Client = new HttpClient();
+			Uri uri = new Uri("http://34.134.176.176:5000/submission");
+
+			string json_str;
+			try
+			{
+				json_str = $"{{\"submission_id\":[{int.Parse(sub_id_0)}, {int.Parse(sub_id_1)}],\"ass_id\" : \"{ass_id}\" }}";
+				Console.WriteLine(json_str);
+			}
+			catch (Exception e)
+			{
+				error = "JSON error: " + e.Message;
+				return;
+			}
+
+			var content = new StringContent(json_str);
+
+			try
+			{
+				HttpResponseMessage response = await Client.PostAsync(uri, content);
+
+				if (response.IsSuccessStatusCode)
+				{
+					string resJson = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+
+					var converter = new ExpandoObjectConverter();
+					resultObj = JsonConvert.DeserializeObject<ExpandoObject>(resJson, converter);
+				}
+				else
+				{
+					error = "POST error";
+				}
+			}
+			catch (Exception e)
+			{
+				error = "Network error: " + e.Message;
+				return;
+			}			
+		}
+	}
 }
