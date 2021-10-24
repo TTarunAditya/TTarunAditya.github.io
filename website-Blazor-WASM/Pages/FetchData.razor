@@ -1,9 +1,11 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime;
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Converters
 @using Newtonsoft.Json.Linq;
 @using System.Dynamic
+@using System.Text;
 
 <PageTitle>Big Data Assignment - Data requests</PageTitle>
 
@@ -36,19 +38,16 @@
 		<br/>
 		
 		<button @onclick=assignment.getSubmissionResult style="margin: 1rem" class="btn btn-primary">Get Results</button>
-	
+
 		<br />
 	
 		<h4>Results: </h4>
 		
 		<p class="text-danger">@assignment.error</p>
 		
-		@if (assignment.resultObj != null)
+		@if (assignment.resJson != null)
 		{
-			foreach (var prop in (IEnumerable<dynamic>)assignment.resultObj)
-			{
-			   <p>@prop. Name: @prop.GetValue(assignment.resultObj,null)</p>;
-			}
+			<p>@assignment.resJson</p>;
 		}
 		else
 		{
@@ -130,7 +129,7 @@
 
 			if (response.IsSuccessStatusCode)
 			{
-				string jobStatus = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+				jobStatus = await response.Content.ReadAsStringAsync();
 			}
 			else
 			{
@@ -146,7 +145,7 @@
 
 	public string submissionStatusError = "";
 	public string? submissionStatus = null;
-	public string statusSubmissionID = "0";
+	public string statusSubmissionID = "240";
 
 	private async Task getSubmissionStatus()
 	{
@@ -165,15 +164,16 @@
 			return;
 		}
 
-		var content = new StringContent(json_str);
+		var data = new StringContent(json_str, Encoding.UTF8, "application/json");
 
 		try
 		{
-			HttpResponseMessage response = await Client.PostAsync(uri, content);
+			HttpResponseMessage response = await Client.PostAsync(uri, data);
 
 			if (response.IsSuccessStatusCode)
 			{
-				submissionStatus = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+				//using await instead of Task.run because of error: Cannot wait on monitors on this runtime
+				submissionStatus = response.Content.ReadAsStringAsync().Result;
 			}
 			else
 			{
@@ -194,10 +194,11 @@
 
 		public readonly string[] ass_options = { "A1", "A2" };
 
-		public string sub_id_0 = "0";
-		public string sub_id_1 = "1";
+		public string sub_id_0 = "240";
+		public string sub_id_1 = "713";
 
 		public string error = "";
+		public string? resJson = null;
 
 		public dynamic? resultObj = null;
 
@@ -217,19 +218,20 @@
 				error = "JSON error: " + e.Message;
 				return;
 			}
-
-			var content = new StringContent(json_str);
+			
+			var data = new StringContent(json_str, Encoding.UTF8, "application/json");
 
 			try
 			{
-				HttpResponseMessage response = await Client.PostAsync(uri, content);
+				HttpResponseMessage response = await Client.PostAsync(uri, data);
 
 				if (response.IsSuccessStatusCode)
 				{
-					string resJson = Task.Run(() => response.Content.ReadAsStringAsync()).Result;
+					resJson = response.Content.ReadAsStringAsync().Result;
 
-					var converter = new ExpandoObjectConverter();
-					resultObj = JsonConvert.DeserializeObject<ExpandoObject>(resJson, converter);
+					//var converter = new ExpandoObjectConverter();
+					//resultObj = JsonConvert.DeserializeObject<ExpandoObject>(resJson, converter);
+					//resultObj = System.Text.Json.JsonSerializer.Deserialize<ExpandoObject>(resJson);
 				}
 				else
 				{
